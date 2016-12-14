@@ -1,29 +1,84 @@
-Backup v4.x
+Backup Remote
 ===========
-
-[![Code Climate](https://codeclimate.com/github/backup/backup.png)](https://codeclimate.com/github/backup/backup)
-[![Build Status](https://travis-ci.org/backup/backup.svg?branch=master)](https://travis-ci.org/backup/backup)
-[![Join the chat at https://gitter.im/backup/backup](https://badges.gitter.im/Join%20Chat.svg)][Gitter]
+Extends [Backup gem](https://github.com/backup/backup) to perform backups on remote servers.
 
 Backup is a system utility for Linux and Mac OS X, distributed as a RubyGem, that allows you to easily perform backup
 operations. It provides an elegant DSL in Ruby for _modeling_ your backups. Backup has built-in support for various
 databases, storage protocols/services, syncers, compressors, encryptors and notifiers which you can mix and match. It
 was built with modularity, extensibility and simplicity in mind.
 
-[Installation][] &middot; [Release Notes][] &middot; [Documentation][] &middot; [Issues][] &middot; [Features][] &middot; [Chat][Gitter]
 
-Please use the Backup features [issue tracker][Features] to suggest new features.
-Only use the Backup gem [issue tracker][Issues] for bugs and other issues.
-We're also available on [Gitter] for questions and problems.
+If you use backup gem you should run `backup perform` on the machine where resources (files, databases) are located.
 
-**Copyright (c) 2009-2016 [Michael van Rooijen][] ( [@mrrooijen] )**  
-Released under the **MIT** [LICENSE](LICENSE).
+This gem adds support for models to perform backups on a remote server.
 
+For example, model to backup MySQL database located on the remote server:
+
+```
+Model.new(:my_backup, 'My Backup') do
+  database MySQL_remote do |db|
+    # options for server
+    db.server_host = "server1.com"
+    db.server_ssh_user = "username"
+    db.server_ssh_password = "mypwd"
+    db.server_ssh_key = "/path/to/ssh/key"
+    db.server_backup_path = "/path/backups/"
+
+    # options to dump database
+    ...
+    # To dump all databases, set `db.name = :all` (or leave blank)
+    db.name               = "my_database_name"
+    db.username           = "my_username"
+    db.password           = "my_password"
+    db.host               = "localhost"
+    db.port               = 3306
+    ...
+    
+  end
+end
+
+
+```
+
+# How it works
+
+Perform backups:
+* specify server connection options in your model
+```
+Model.new(:my_backup, 'My Backup') do
+  database RemoteMySQL do |db|
+    # options for server
+    db.server_host = "server1.com"
+    db.server_ssh_user = "username"
+    db.server_ssh_password = "mypwd"
+    db.server_ssh_key = "/path/to/ssh/key"
+````
+
+* perform backup - run script `backup peform` from the backup server
+```
+backup-remote perform -t my_backup
+```
+
+* it will connect to the remote server by SSH and run command remotely which creates a backup file
+* then it downloads the archive file from the remote server to the backup machine
+* finally, it performs all operations with backup as original gem backup, like storing file to storages, etc.
+
+
+
+
+
+# Archives
+
+## Archive files on a remote server
+
+# Databases
+
+## Backup database on a remote server
+
+
+ 
+
+# Backup gem
 [Installation]:  http://backup.github.io/backup/v4/installation
 [Release Notes]: http://backup.github.io/backup/v4/release-notes
 [Documentation]: http://backup.github.io/backup/v4
-[Issues]: https://github.com/backup/backup/issues
-[Features]: https://github.com/backup/backup-features/issues
-[Gitter]: https://gitter.im/backup/backup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[Michael van Rooijen]: http://github.com/mrrooijen
-[@mrrooijen]: http://twitter.com/mrrooijen

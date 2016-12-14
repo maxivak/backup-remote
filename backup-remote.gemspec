@@ -3,15 +3,17 @@
 require File.expand_path('lib/backup/version')
 
 Gem::Specification.new do |gem|
-  gem.name        = 'backup'
+  gem.name        = 'backup-remote'
   gem.version     = Backup::VERSION
   gem.platform    = Gem::Platform::RUBY
-  gem.authors     = 'Michael van Rooijen'
-  gem.email       = 'meskyanichi@gmail.com'
-  gem.homepage    = 'https://github.com/backup/backup'
+  gem.authors     = 'Max Ivak, Michael van Rooijen'
+  gem.email       = 'maxivak@gmail.com'
+  gem.homepage    = 'https://github.com/maxivak/backup'
   gem.license     = 'MIT'
-  gem.summary     = 'Provides an elegant DSL in Ruby for performing backups on UNIX-like systems.'
+  gem.summary     = 'Extends Backup gem to perform backups on remote servers. Provides an elegant DSL in Ruby for performing backups on UNIX-like systems.'
+
   gem.description = <<-EOS.gsub(/\s+/, ' ').strip
+    Extends Backup gem to perform backups on remote servers.
     Backup is a RubyGem, written for UNIX-like operating systems, that allows you to easily perform backup operations
     on both your remote and local environments. It provides you with an elegant DSL in Ruby for modeling your backups.
     Backup has built-in support for various databases, storage protocols/services, syncers, compressors, encryptors
@@ -20,7 +22,7 @@ Gem::Specification.new do |gem|
 
   gem.files = %x[git ls-files -- lib bin templates README.md LICENSE.md].split("\n")
   gem.require_path  = 'lib'
-  gem.executables   = ['backup']
+  gem.executables   = ['backup-remote']
 
   gem.required_ruby_version = '>= 2.0'
 
@@ -91,4 +93,9 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'unf', '= 0.1.3'
   gem.add_dependency 'unf_ext', '= 0.0.6'
   gem.add_dependency 'xml-simple', '= 1.1.4'
+
+  gem.add_dependency 'sshkit', '= 1.11.3'
+  gem.add_dependency 'sshkit-sudo', '= 0.1.0'
+
+
 end
