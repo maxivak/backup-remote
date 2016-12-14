@@ -1,50 +1,25 @@
 Backup Remote
 ===========
-Extends [Backup gem](https://github.com/backup/backup) to perform backups on remote servers.
-
-Backup is a system utility for Linux and Mac OS X, distributed as a RubyGem, that allows you to easily perform backup
-operations. It provides an elegant DSL in Ruby for _modeling_ your backups. Backup has built-in support for various
-databases, storage protocols/services, syncers, compressors, encryptors and notifiers which you can mix and match. It
-was built with modularity, extensibility and simplicity in mind.
-
+Backup-remote gem extends [Backup gem](https://github.com/backup/backup) to perform backups on remote servers.
 
 If you use backup gem you should run `backup perform` on the machine where resources (files, databases) are located.
 
 This gem adds support for models to perform backups on a remote server.
 
-For example, model to backup MySQL database located on the remote server:
-
-```
-Model.new(:my_backup, 'My Backup') do
-  database MySQL_remote do |db|
-    # options for server
-    db.server_host = "server1.com"
-    db.server_ssh_user = "username"
-    db.server_ssh_password = "mypwd"
-    db.server_ssh_key = "/path/to/ssh/key"
-    db.server_backup_path = "/path/backups/"
-
-    # options to dump database
-    ...
-    # To dump all databases, set `db.name = :all` (or leave blank)
-    db.name               = "my_database_name"
-    db.username           = "my_username"
-    db.password           = "my_password"
-    db.host               = "localhost"
-    db.port               = 3306
-    ...
-    
-  end
-end
 
 
-```
+Backup is a system utility for Linux and Mac OS X, distributed as a RubyGem, that allows you to easily perform backup
+operations. It provides an elegant DSL in Ruby for _modeling_ your backups. 
+Backup has built-in support for various databases, storage protocols/services, syncers, compressors, encryptors and notifiers which you can mix and match. 
+
+
 
 # How it works
 
 Backup process:
 
 * specify server connection options in your model
+
 ```
 Model.new(:my_backup, 'My Backup') do
   database RemoteMySQL do |db|
@@ -53,6 +28,13 @@ Model.new(:my_backup, 'My Backup') do
     db.server_ssh_user = "username"
     db.server_ssh_password = "mypwd"
     db.server_ssh_key = "/path/to/ssh/key"
+    
+    # other options for resource
+    ...
+    
+  end
+  ...    
+end
 ````
 
 * perform backup - run script `backup peform` from the backup server
@@ -69,6 +51,15 @@ backup-remote perform -t my_backup
 
 It uses SSHKit to connect to server by SSH.
 
+
+
+# Options
+
+Options for SSH connection:
+* server_host - host name or IP
+* server_ssh_user - user name to connect by SSH
+* server_ssh_password - not used if server_ssh-key is provided
+* server_ssh_key - (optional) - path to ssh key
 
 
 
