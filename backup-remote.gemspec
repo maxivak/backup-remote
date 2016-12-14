@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.platform    = Gem::Platform::RUBY
   gem.authors     = 'Max Ivak, Michael van Rooijen'
   gem.email       = 'maxivak@gmail.com'
-  gem.homepage    = 'https://github.com/maxivak/backup'
+  gem.homepage    = 'https://github.com/maxivak/backup-remote'
   gem.license     = 'MIT'
   gem.summary     = 'Extends Backup gem to perform backups on remote servers. Provides an elegant DSL in Ruby for performing backups on UNIX-like systems.'
 
@@ -38,7 +38,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'dogapi', '= 1.11.0'
   gem.add_dependency 'dropbox-sdk', '= 1.6.5'
   gem.add_dependency 'equalizer', '= 0.0.9'
-  gem.add_dependency 'excon', '= 0.44.4'
+  #gem.add_dependency 'excon', '= 0.44.4'
+  gem.add_dependency 'excon', '= 0.51.0'
   gem.add_dependency 'faraday', '= 0.8.8'
   gem.add_dependency 'fission', '= 0.5.0'
   gem.add_dependency 'flowdock', '= 0.4.0'
@@ -80,7 +81,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'net-ssh', '= 3.2.0'
   gem.add_dependency 'netrc', '= 0.11.0'
   gem.add_dependency 'nokogiri', '= 1.6.8'
-  gem.add_dependency 'open4', '= 1.3.0'
+  #gem.add_dependency 'open4', '= 1.3.0'
+  gem.add_dependency 'open4', '= 1.3.4'
   gem.add_dependency 'pagerduty', '= 2.0.0'
   gem.add_dependency 'pkg-config', '= 1.1.7'
   gem.add_dependency 'qiniu', '= 6.5.1'
