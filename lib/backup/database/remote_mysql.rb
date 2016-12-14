@@ -93,13 +93,6 @@ module Backup
       def perform!
         super
 
-        # perform remote command
-
-        # download dump from server
-
-        puts "file: #{dump_filename}"
-
-        exit
 
         #
         pipeline = Pipeline.new
@@ -112,15 +105,53 @@ module Backup
           dump_ext << ext
         end if model.compressor
 
-        pipeline << "#{ utility(:cat) } > " +
-            "'#{ File.join(dump_path, dump_filename) }.#{ dump_ext }'"
+        dump_remote_file = File.join('/tmp', dump_filename+"."+dump_ext)
+        pipeline << "#{ utility(:cat) } > '#{ dump_remote_file }'"
 
-        pipeline.run
-        if pipeline.success?
-          log!(:finished)
-        else
-          raise Error, "Dump Failed!\n" + pipeline.error_messages
+
+
+
+        # generate backup on remote server
+        cmd_remote = pipeline.commands.join(" | ")
+
+        remote = Backup::Remote::Command.new
+        res_generate = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd_remote)
+
+        if res_generate[:res]==0
+          raise 'Cannot create backup on server'
         end
+
+        # download backup
+        dump_file = File.join(dump_path, dump_filename+"."+dump_ext)
+
+        #puts "dump local: #{dump_file}"
+
+        res_download = remote.ssh_download_file(server_host, server_ssh_user, server_ssh_password, dump_remote_file, dump_file)
+
+        #puts "res: #{res_download}"
+
+        if res_download[:res]==0
+          raise 'Cannot download file from server'
+        end
+
+        #puts "pipe: #{pipeline.commands.inspect}"
+        #puts "cmd: #{cmd_remote}"
+
+        #exit
+
+        # download dump from server
+
+        #puts "file: #{dump_filename}"
+        #puts "path: #{dump_path}"
+
+        #exit
+
+        #pipeline.run
+        #if pipeline.success?
+        #  log!(:finished)
+        #else
+        #  raise Error, "Dump Failed!\n" + pipeline.error_messages
+        #end
       end
 
       private

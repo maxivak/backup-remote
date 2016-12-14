@@ -27,7 +27,10 @@ module Backup
           create_modules(
             DSL,
             [ # Databases
-              ['MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Riak', 'OpenLDAP', 'SQLite'],
+              ['MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Riak', 'OpenLDAP', 'SQLite',
+               'RemoteMySQL'
+              ],
+
               # Storages
               ['S3', 'CloudFiles', 'Ninefold', 'Dropbox', 'FTP',
               'SFTP', 'SCP', 'RSync', 'Local', 'Qiniu'],

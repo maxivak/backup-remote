@@ -124,6 +124,15 @@ module Backup
   end
 
   ##
+  # Autoload Remote files
+  LIB_REMOTE_PATH      = File.join(LIBRARY_PATH, 'remote')
+
+  module Remote
+    autoload :Command,      File.join(LIB_REMOTE_PATH, 'command')
+  end
+
+
+  ##
   # Require Backup base files
   %w{
     errors

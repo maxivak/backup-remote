@@ -8,6 +8,10 @@ module Backup
 
     attr_reader :stderr, :errors
 
+    def commands
+      @commands
+    end
+
     def initialize
       @commands = []
       @success_codes = []

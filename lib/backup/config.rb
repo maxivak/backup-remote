@@ -39,10 +39,12 @@ module Backup
         end
 
         dsl = DSL.new
+
         dsl.instance_eval(config, config_file)
 
         update(dsl._config_options)  # from config.rb
         update(options)              # command line takes precedence
+
 
         Dir[File.join(File.dirname(config_file), 'models', '*.rb')].each do |model|
           dsl.instance_eval(File.read(model), model)

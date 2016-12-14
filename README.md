@@ -42,7 +42,8 @@ end
 
 # How it works
 
-Perform backups:
+Backup process:
+
 * specify server connection options in your model
 ```
 Model.new(:my_backup, 'My Backup') do
@@ -60,9 +61,13 @@ backup-remote perform -t my_backup
 ```
 
 * it will connect to the remote server by SSH and run command remotely which creates a backup file
-* then it downloads the archive file from the remote server to the backup machine
-* finally, it performs all operations with backup as original gem backup, like storing file to storages, etc.
+* then it downloads the archive file from the remote server to the backup server
+* finally, it performs all operations with backup file, like storing file to storages, etc. as gem backup does.
 
+
+
+
+It uses SSHKit to connect to server by SSH.
 
 
 
@@ -71,12 +76,44 @@ backup-remote perform -t my_backup
 
 ## Archive files on a remote server
 
+* Use RemoteArchive
+
+```
+```
+
+
 # Databases
 
 ## Backup database on a remote server
 
+* Now it is implemented the following databases:
+* RemoteMySQL
 
- 
+### RemoteMySQL
+
+```
+Model.new(:my_backup, 'My Backup') do
+  database RemoteMySQL do |db|
+    # options for server
+    db.server_host = "server1.com"
+    db.server_ssh_user = "username"
+    db.server_ssh_password = "mypwd"
+    db.server_ssh_key = "/path/to/ssh/key"
+    
+    ### options for MySQL 
+    # see http://backup.github.io/backup/v4/database-mysql/
+    
+    ...
+  end
+  ..
+end  
+    
+````
+
+# Custom backup command
+
+* Run custom command to create a backup archive on a remote server
+
 
 # Backup gem
 [Installation]:  http://backup.github.io/backup/v4/installation
