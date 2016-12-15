@@ -140,6 +140,12 @@ module Backup
     end
 
     ##
+    # Adds a Remote Archive. Multiple archives may be added to the model.
+    def remote_archive(name, &block)
+      @archives << RemoteArchive.new(self, name, &block)
+    end
+
+    ##
     # Adds an Database. Multiple Databases may be added to the model.
     def database(name, database_id = nil, &block)
       @databases << get_class_from_scope(Database, name).

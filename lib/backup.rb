@@ -24,6 +24,8 @@ Excon.defaults[:middlewares].delete(Excon::Middleware::Idempotent)
 # The Backup Ruby Gem
 module Backup
 
+  puts "init module"
+
   ##
   # Backup's internal paths
   LIBRARY_PATH       = File.join(File.dirname(__FILE__), 'backup')
@@ -139,7 +141,6 @@ module Backup
     logger
     utilities
     archive
-    remote_archive
     binder
     cleaner
     model
@@ -150,7 +151,12 @@ module Backup
     pipeline
     splitter
     template
+
+    remote_archive
+
     version
-  }.each {|lib| require File.join(LIBRARY_PATH, lib) }
+  }.each do |lib|
+    require File.join(LIBRARY_PATH, lib)
+  end
 
 end

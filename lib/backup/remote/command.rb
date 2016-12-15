@@ -77,6 +77,39 @@ module Backup
         }
       end
 
+  def ssh_upload_file(hostname, ssh_user, ssh_pass, source_file, dest_file, handler=nil)
+    host = SSHKit::Host.new("#{ssh_user}@#{hostname}")
+    host.password = ssh_pass
+
+    # scp
+    f_temp = "/tmp/#{SecureRandom.uuid}"
+
+    # sshkit
+    on host do |host|
+      as(user: ssh_user) do
+
+      end
+
+      # NOT WORK with sudo
+      #upload! source_file, dest_file
+
+      # upload to temp file
+      upload! source_file, f_temp
+
+      # upload to dest
+      execute("cp #{f_temp} #{dest_file}", interaction_handler: handler)
+
+    end
+
+    #
+    return     {res: 1, output: ""}
+  rescue => e
+    {
+        res: 0,
+        error: e.message
+    }
+  end
+
 end
 end
 end

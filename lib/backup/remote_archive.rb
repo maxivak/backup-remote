@@ -8,11 +8,11 @@ require 'sshkit/sudo'
 
 
 module Backup
-  class RemoteArchive
+  class RemoteArchive < Archive
     class Error < Backup::Error; end
 
     include Utilities::Helpers
-    attr_reader :name, :options
+    #attr_reader :name, :options
 
     include SSHKit::DSL
 
@@ -79,7 +79,13 @@ module Backup
         :excludes    => [],
         :tar_options => ''
       }
+
       DSL.new(@options).instance_eval(&block)
+
+      #
+      self.server_host = @options[:server_host]
+      self.server_ssh_user = @options[:server_ssh_user]
+      self.server_ssh_password = @options[:server_ssh_password]
     end
 
     def perform!
@@ -87,14 +93,27 @@ module Backup
 
       #
 
+      remote = Backup::Remote::Command.new
+
+
       path = File.join(Config.tmp_path, @model.trigger, 'archives')
       FileUtils.mkdir_p(path)
 
+
+
       pipeline = Pipeline.new
       with_files_from(paths_to_package) do |files_from|
+        # upload to server
+        res_upload = remote.ssh_upload_file(server_host, server_ssh_user, server_ssh_password, files_from, files_from)
+
+        if res_upload[:res]==0
+          raise 'Cannot upload file from server - #{files_from}'
+        end
+
+        #
         pipeline.add(
           "#{ tar_command } #{ tar_options } -cPf -#{ tar_root } " +
-          "#{ paths_to_exclude } #{ files_from }",
+          "#{ paths_to_exclude } -T '#{ files_from }'",
           tar_success_codes
         )
 
@@ -104,7 +123,10 @@ module Backup
           extension << ext
         end if @model.compressor
 
-        pipeline << "#{ utility(:cat) } > '#{ File.join(path, "#{ name }.#{ extension }") }'"
+        #
+        archive_file = File.join(path, "#{ name }.#{ extension }")
+        remote_archive_file = File.join('/tmp', "#{ name }.#{ extension }")
+        pipeline << "#{ utility(:cat) } > '#{ remote_archive_file }'"
 
 
         #pipeline.run
@@ -112,11 +134,10 @@ module Backup
         # generate backup on remote server
         cmd_remote = pipeline.commands.join(" | ")
 
-        puts "commands: #{cmd_remote}"
-        exit
+        #puts "remote cmd: #{cmd_remote}"
+        #exit
 
 
-        remote = Backup::Remote::Command.new
         res_generate = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd_remote)
 
         if res_generate[:res]==0
@@ -124,25 +145,26 @@ module Backup
         end
 
         # download backup
-        dump_file = File.join(dump_path, dump_filename+"."+dump_ext)
-
-        #puts "dump local: #{dump_file}"
-
-        res_download = remote.ssh_download_file(server_host, server_ssh_user, server_ssh_password, dump_remote_file, dump_file)
+        res_download = remote.ssh_download_file(server_host, server_ssh_user, server_ssh_password, remote_archive_file, archive_file)
 
         #puts "res: #{res_download}"
 
         if res_download[:res]==0
           raise 'Cannot download file from server'
         end
+
+        # delete archive on server
+        res_delete = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, "rm #{remote_archive_file}")
+
       end
 
-      if pipeline.success?
-        Logger.info "Archive '#{ name }' Complete!"
-      else
-        raise Error, "Failed to Create Archive '#{ name }'\n" +
-            pipeline.error_messages
-      end
+      Logger.info "Archive '#{ name }' Complete!"
+
+      #if pipeline.success?
+      #  Logger.info "Archive '#{ name }' Complete!"
+      #else
+      #  raise Error, "Failed to Create Archive '#{ name }'\n" + pipeline.error_messages
+      #end
     end
 
     private
@@ -164,8 +186,15 @@ module Backup
       tmpfile = Tempfile.new('backup-archive-paths')
       paths.each {|path| tmpfile.puts path }
       tmpfile.close
-      yield "-T '#{ tmpfile.path }'"
+
+      puts "tmpfile #{tmpfile.path}"
+
+      puts "content: #{File.read(tmpfile.path)}"
+      #yield "-T '#{ tmpfile.path }'"
+      yield "#{ tmpfile.path }"
     ensure
+
+      puts "delete file #{tmpfile.path}"
       tmpfile.delete
     end
 
@@ -176,7 +205,12 @@ module Backup
     end
 
     def prepare_path(path)
-      options[:root] ? path : File.expand_path(path)
+
+      res = options[:root] ? path : File.expand_path(path)
+
+      puts "path #{path} ===> #{res}"
+
+      res
     end
 
     def tar_options
@@ -188,11 +222,27 @@ module Backup
       gnu_tar? ? [0, 1] : [0]
     end
 
+
+    ### DSL for RemoteArchive
     class DSL
       def initialize(options)
         @options = options
       end
 
+
+      ### remote server
+      def server_host=(val = true)
+        @options[:server_host] = val
+      end
+
+      def server_ssh_user=(val = true)
+        @options[:server_ssh_user] = val
+      end
+      def server_ssh_password=(val = true)
+        @options[:server_ssh_password] = val
+      end
+
+      ###
       def use_sudo(val = true)
         @options[:sudo] = val
       end
