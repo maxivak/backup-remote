@@ -12,6 +12,12 @@ Backup is a system utility for Linux and Mac OS X, distributed as a RubyGem, tha
 operations. It provides an elegant DSL in Ruby for _modeling_ your backups. 
 Backup has built-in support for various databases, storage protocols/services, syncers, compressors, encryptors and notifiers which you can mix and match. 
 
+The gem adds the following model components:
+* Remote Archive
+* Remote MySQL database
+* Remote data
+
+
 
 
 # How it works
@@ -67,10 +73,33 @@ Options for SSH connection:
 
 ## Archive files on a remote server
 
-* Use RemoteArchive
+* Use remote_archive in your model
+
 
 ```
+
+Model.new(:my_server_files_backup, 'Backup files') do
+
+  remote_archive :files do |archive|
+    archive.server_host = "myserver.com"
+    archive.server_ssh_user = "user"
+    archive.server_ssh_password = "pwd"
+
+
+    # archive options - the same options as for archive
+    # see  http://backup.github.io/backup/v4/archives/
+
+
+  end
+  
+  ...
+  
+end  
+    
 ```
+
+Options:
+* server_command - command to create archive file
 
 
 # Databases
@@ -79,6 +108,7 @@ Options for SSH connection:
 
 * Now it is implemented the following databases:
 * RemoteMySQL
+
 
 ### RemoteMySQL
 
@@ -97,13 +127,45 @@ Model.new(:my_backup, 'My Backup') do
     ...
   end
   ..
-end  
-    
+end
+
 ````
 
-# Custom backup command
 
-* Run custom command to create a backup archive on a remote server
+
+# Custom data on remote server
+
+* Run custom command on the remote server to create a backup archive
+
+* Specify command to run to generate archive file on the remote server
+
+* This command should create an archive file with filename specified in server_path option.
+
+
+```
+Model.new(:my_server_data_backup, 'Backup data') do
+
+  remote_data :mydata do |archive|
+    archive.server_host = "myserver.com"
+    archive.server_ssh_user = "user"
+    archive.server_ssh_password = "pwd"
+    
+    
+    archive.command = "--any command to generate backup archive file--"
+    # archive.command = "echo '1' > /tmp/backup.txt"
+    
+    archive.server_path = "/path/to/archive.tar.gz"
+    # archive.command = "/tmp/backup.txt"
+
+
+    
+  end
+  
+  ...
+  
+end  
+    
+```
 
 
 # Backup gem
