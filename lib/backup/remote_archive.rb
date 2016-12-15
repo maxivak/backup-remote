@@ -203,12 +203,7 @@ module Backup
     end
 
     def prepare_path(path)
-
-      res = options[:root] ? path : File.expand_path(path)
-
-      puts "path #{path} ===> #{res}"
-
-      res
+      options[:root] ? path : File.expand_path(path)
     end
 
     def tar_options
