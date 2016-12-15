@@ -98,9 +98,6 @@ end
     
 ```
 
-Options:
-* server_command - command to create archive file
-
 
 # Databases
 
@@ -110,7 +107,7 @@ Options:
 * RemoteMySQL
 
 
-### RemoteMySQL
+### Remote MySQL Database
 
 ```
 Model.new(:my_backup, 'My Backup') do
@@ -152,12 +149,12 @@ Model.new(:my_server_data_backup, 'Backup data') do
     
     
     archive.command = "--any command to generate backup archive file--"
+    archive.server_path = "/path/to/backup.tar.gz"
+
+    # example:
+    # archive.command = "/tmp/backup.txt"
     # archive.command = "echo '1' > /tmp/backup.txt"
     
-    archive.server_path = "/path/to/archive.tar.gz"
-    # archive.command = "/tmp/backup.txt"
-
-
     
   end
   
