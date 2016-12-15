@@ -24,8 +24,6 @@ Excon.defaults[:middlewares].delete(Excon::Middleware::Idempotent)
 # The Backup Ruby Gem
 module Backup
 
-  puts "init module"
-
   ##
   # Backup's internal paths
   LIBRARY_PATH       = File.join(File.dirname(__FILE__), 'backup')
@@ -153,6 +151,7 @@ module Backup
     template
 
     remote_archive
+    remote_data
 
     version
   }.each do |lib|

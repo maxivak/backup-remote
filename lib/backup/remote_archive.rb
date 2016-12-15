@@ -92,14 +92,12 @@ module Backup
       Logger.info "Creating Archive '#{ name }'..."
 
       #
-
-      remote = Backup::Remote::Command.new
-
-
       path = File.join(Config.tmp_path, @model.trigger, 'archives')
       FileUtils.mkdir_p(path)
 
 
+      #
+      remote = Backup::Remote::Command.new
 
       pipeline = Pipeline.new
       with_files_from(paths_to_package) do |files_from|
