@@ -165,7 +165,3 @@ end
 ```
 
 
-# Backup gem
-[Installation]:  http://backup.github.io/backup/v4/installation
-[Release Notes]: http://backup.github.io/backup/v4/release-notes
-[Documentation]: http://backup.github.io/backup/v4
