@@ -139,6 +139,7 @@ module Backup
     logger
     utilities
     archive
+    remote_archive
     binder
     cleaner
     model
