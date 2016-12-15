@@ -89,7 +89,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'rest-client', '= 1.7.3'
   gem.add_dependency 'ruby-hmac', '= 0.4.0'
   gem.add_dependency 'simple_oauth', '= 0.2.0'
-  gem.add_dependency 'thor', '= 0.18.1'
+  gem.add_dependency 'thor', '= 0.19.1'
   gem.add_dependency 'thread_safe', '= 0.1.3'
   gem.add_dependency 'twitter', '= 5.5.0'
   gem.add_dependency 'unf', '= 0.1.3'
