@@ -134,7 +134,7 @@ end
 
 * Run custom command on the remote server to create a backup archive
 
-* Specify command to run to generate archive file on the remote server
+* Specify command (or script) to run to generate archive file on the remote server
 
 * This command should create an archive file with filename specified in server_path option.
 
@@ -149,6 +149,7 @@ Model.new(:my_server_data_backup, 'Backup data') do
     
     
     archive.command = "--any command to generate backup archive file--"
+    archive.script = "--path to script to copy to server and run--" 
     archive.server_path = "/path/to/backup.tar.gz"
 
     # example:
@@ -164,4 +165,12 @@ end
     
 ```
 
+Options:
 
+* command - command to run to generate backup on server. Not used if script is specified.
+* script - path to script file to upload and run on server to generate backup. Script is stored locally nad is uploaded to server.
+
+
+
+
+### Examples

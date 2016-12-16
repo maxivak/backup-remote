@@ -23,6 +23,7 @@ module Backup
     attr_accessor :server_ssh_key
     attr_accessor :server_path
     attr_accessor :server_command
+    attr_accessor :script
 
 
 
@@ -47,6 +48,7 @@ module Backup
       self.server_ssh_password = @options[:server_ssh_password]
       self.server_path = @options[:server_path]
       self.server_command = @options[:server_command]
+      self.script = @options[:script]
     end
 
     def perform!
@@ -64,16 +66,39 @@ module Backup
 
       Dir.mktmpdir do |temp_dir|
         temp_local_file = File.join("#{temp_dir}", File.basename(server_path))
-        #temp_local_file = File.join(path, File.basename(server_path))
-        #temp_local_file = Tempfile.new("").path+"."+File.extname(server_path)
 
         remote_archive_file = server_path
 
         # generate backup on remote server
-        cmd_remote = server_command
-        res_generate = remote.run_ssh_cmd(
-            server_host, server_ssh_user, server_ssh_password,
-            cmd_remote)
+        remote_script = script
+
+        if remote_script && remote_script!=""
+          # use script
+          # upload script
+          local_script_path = File.join(Config.root_path, remote_script)
+
+          f_remote = Tempfile.new('backup')
+          remote_script_path = f_remote.path+"."+File.extname(local_script_path)
+
+          #puts "upload script #{local_script_path} --> #{remote_script_path}"
+          remote.ssh_upload_file(server_host, server_ssh_user, server_ssh_password, local_script_path, remote_script_path)
+
+          cmd_remote = "chmod +x #{remote_script_path} && sh #{remote_script_path}"
+          res_generate = remote.run_ssh_cmd(
+              server_host, server_ssh_user, server_ssh_password,
+              cmd_remote)
+
+          # delete temp script
+          cmd_delete = "rm -rf #{remote_script_path}"
+          res_delete = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd_delete)
+
+        else
+          # use command
+          cmd_remote = server_command
+          res_generate = remote.run_ssh_cmd(
+              server_host, server_ssh_user, server_ssh_password,
+              cmd_remote)
+        end
 
         if res_generate[:res]==0
           raise 'Cannot create backup on server'
@@ -154,7 +179,6 @@ module Backup
       yield "#{ tmpfile.path }"
     ensure
 
-      puts "delete file #{tmpfile.path}"
       tmpfile.delete
     end
 
@@ -199,6 +223,9 @@ module Backup
 
       def server_command=(val = true)
         @options[:server_command] = val
+      end
+      def script=(val = true)
+        @options[:script] = val
       end
       def server_path=(val = true)
         @options[:server_path] = val

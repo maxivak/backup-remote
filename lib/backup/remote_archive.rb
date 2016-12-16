@@ -185,14 +185,9 @@ module Backup
       paths.each {|path| tmpfile.puts path }
       tmpfile.close
 
-      puts "tmpfile #{tmpfile.path}"
-
-      puts "content: #{File.read(tmpfile.path)}"
       #yield "-T '#{ tmpfile.path }'"
       yield "#{ tmpfile.path }"
     ensure
-
-      puts "delete file #{tmpfile.path}"
       tmpfile.delete
     end
 
