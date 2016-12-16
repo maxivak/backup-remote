@@ -80,7 +80,7 @@ module Backup
         end
 
         # download backup
-        puts "download"
+        #puts "download from #{remote_archive_file} to #{temp_local_file}"
         res_download = remote.ssh_download_file(
             server_host, server_ssh_user, server_ssh_password,
             remote_archive_file, temp_local_file)
