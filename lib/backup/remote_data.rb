@@ -80,6 +80,7 @@ module Backup
         end
 
         # download backup
+        puts "download"
         res_download = remote.ssh_download_file(
             server_host, server_ssh_user, server_ssh_password,
             remote_archive_file, temp_local_file)
@@ -149,9 +150,6 @@ module Backup
       paths.each {|path| tmpfile.puts path }
       tmpfile.close
 
-      puts "tmpfile #{tmpfile.path}"
-
-      puts "content: #{File.read(tmpfile.path)}"
       #yield "-T '#{ tmpfile.path }'"
       yield "#{ tmpfile.path }"
     ensure
