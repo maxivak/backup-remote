@@ -75,6 +75,10 @@ module Backup
         if remote_script && remote_script!=""
           # use script
           # upload script
+
+          puts "config root: #{Config.root_path}"
+          puts "config: #{Config.inspect}"
+
           local_script_path = File.join(Config.root_path, remote_script)
 
           f_remote = Tempfile.new('backup')
