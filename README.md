@@ -6,6 +6,11 @@ If you use backup gem you should run `backup perform` on the machine where resou
 
 This gem adds support for models to perform backups on a remote server.
 
+This gem realizes pull strategy when the backup files are pulled from the remote server to the backup server and then backup files are distributed to backup storages. 
+Backup gem realizes as push strategy when the backup files are created and pushed from remote server to backup storages from the server itself.
+
+It means that for using backup-remote gem you don't need to setup additional software on the remote server (like ruby, gems, etc) to perform backups.
+Only ssh access is needed for the remote server.
 
 
 Backup is a system utility for Linux and Mac OS X, distributed as a RubyGem, that allows you to easily perform backup
@@ -169,6 +174,7 @@ Options:
 
 * command - command to run to generate backup on server. Not used if script is specified.
 * script - path to script file to upload and run on server to generate backup. Script is stored locally nad is uploaded to server.
+script path is relative to root-path.
 
 
 
