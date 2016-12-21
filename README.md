@@ -71,6 +71,7 @@ Options for SSH connection:
 * server_ssh_user - user name to connect by SSH
 * server_ssh_password - not used if server_ssh-key is provided
 * server_ssh_key - (optional) - path to ssh key
+* temp_dir_path - (optional) - specify temporary directory path where backup files will be downloaded. By default, it is '/tmp'
 
 
 

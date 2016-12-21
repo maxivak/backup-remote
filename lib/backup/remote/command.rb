@@ -66,7 +66,7 @@ module Backup
   end
 
   def ssh_download_file_scp(hostname, ssh_user, ssh_pass, remote_filename, dest_filename)
-    #Net::SCP.download!(hostname, ssh_user, remote_filename, dest_filename, :ssh => { :password => ssh_pass })
+    Net::SCP.download!(hostname, ssh_user, remote_filename, dest_filename, :ssh => { :password => ssh_pass })
 
     #
     return {res: 1, output: ""}

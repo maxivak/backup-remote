@@ -75,15 +75,13 @@ module Backup
         # use script
         # upload script
 
-        puts "config root: #{Config.root_path}"
-        puts "config: #{Config.inspect}"
-
         local_script_path = File.join(Config.root_path, remote_script)
 
         f_remote = Tempfile.new('backup')
         remote_script_path = f_remote.path+"."+File.extname(local_script_path)
 
-        #puts "upload script #{local_script_path} --> #{remote_script_path}"
+        Logger.debug "upload script #{local_script_path} --> #{remote_script_path}"
+
         remote.ssh_upload_file(server_host, server_ssh_user, server_ssh_password, local_script_path, remote_script_path)
 
         cmd_remote = "chmod +x #{remote_script_path} && sh #{remote_script_path}"
@@ -119,7 +117,8 @@ module Backup
       FileUtils.mkdir_p File.dirname(temp_local_file)
 
       # download backup
-      puts "download from #{remote_archive_file} to #{temp_local_file}"
+      Logger.debug "download from #{remote_archive_file} to #{temp_local_file}"
+
       res_download = remote.ssh_download_file(
           server_host, server_ssh_user, server_ssh_password,
           remote_archive_file, temp_local_file)
@@ -139,7 +138,7 @@ module Backup
       pipeline = Pipeline.new
 
       #temp_tar_root= tar_root
-      temp_tar_root= temp_dir
+      temp_tar_root= temp_dir_path
       pipeline.add(
           "#{ tar_command } #{ tar_options } -cPf - -C #{temp_tar_root } #{ File.basename(temp_local_file) }",
           tar_success_codes
@@ -249,7 +248,7 @@ module Backup
         @options[:server_path] = val
       end
 
-      def temp_dir_path(val = true)
+      def temp_dir_path=(val = true)
         @options[:temp_dir_path] = val
       end
 
