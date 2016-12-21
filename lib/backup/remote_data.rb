@@ -24,6 +24,7 @@ module Backup
     attr_accessor :server_path
     attr_accessor :server_command
     attr_accessor :script
+    attr_accessor :temp_dir_path
 
 
 
@@ -49,6 +50,7 @@ module Backup
       self.server_path = @options[:server_path]
       self.server_command = @options[:server_command]
       self.script = @options[:script]
+      self.temp_dir_path = @options[:temp_dir_path] || '/tmp'
     end
 
     def perform!
@@ -106,58 +108,69 @@ module Backup
       end
 
 
-      Dir.mktmpdir do |temp_dir|
-        temp_local_file = File.join("#{temp_dir}", File.basename(server_path))
 
-        # download backup
-        #puts "download from #{remote_archive_file} to #{temp_local_file}"
-        res_download = remote.ssh_download_file(
-            server_host, server_ssh_user, server_ssh_password,
-            remote_archive_file, temp_local_file)
+      #Dir.mktmpdir do |temp_dir|
 
-        if res_download[:res]==0
-          raise 'Cannot download file from server'
-        end
+      #temp_local_file = File.join("#{temp_dir}", File.basename(server_path))
 
-        # delete archive on server
-        res_delete = remote.run_ssh_cmd(
-            server_host, server_ssh_user, server_ssh_password,
-            "rm #{remote_archive_file}")
+      temp_local_file = File.join("#{temp_dir_path}/#{Time.now.to_i}#{rand(1000)}/", File.basename(server_path))
 
+      #path = File.expand_path "#{Dir.tmpdir}/#{Time.now.to_i}#{rand(1000)}/"
+      FileUtils.mkdir_p File.dirname(temp_local_file)
 
-        # process archive locally
+      # download backup
+      puts "download from #{remote_archive_file} to #{temp_local_file}"
+      res_download = remote.ssh_download_file(
+          server_host, server_ssh_user, server_ssh_password,
+          remote_archive_file, temp_local_file)
 
-        pipeline = Pipeline.new
-
-        #temp_tar_root= tar_root
-        temp_tar_root= temp_dir
-        pipeline.add(
-            "#{ tar_command } #{ tar_options } -cPf - -C #{temp_tar_root } #{ File.basename(temp_local_file) }",
-            tar_success_codes
-        )
-
-        extension = 'tar'
-        @model.compressor.compress_with do |command, ext|
-          pipeline << command
-          extension << ext
-        end if @model.compressor
-
-        pipeline << "#{ utility(:cat) } > '#{ File.join(path, "#{ name }.#{ extension }") }'"
-
-        #puts "commands: #{pipeline.commands}"
-        #exit
-
-        pipeline.run
-
-
-        if pipeline.success?
-          Logger.info "Archive '#{ name }' Complete!"
-        else
-          raise Error, "Failed to Create Archive '#{ name }'\n" +
-              pipeline.error_messages
-        end
-
+      if res_download[:res]==0
+        raise 'Cannot download file from server'
       end
+
+      # delete archive on server
+      res_delete = remote.run_ssh_cmd(
+          server_host, server_ssh_user, server_ssh_password,
+          "rm #{remote_archive_file}")
+
+
+      # process archive locally
+
+      pipeline = Pipeline.new
+
+      #temp_tar_root= tar_root
+      temp_tar_root= temp_dir
+      pipeline.add(
+          "#{ tar_command } #{ tar_options } -cPf - -C #{temp_tar_root } #{ File.basename(temp_local_file) }",
+          tar_success_codes
+      )
+
+      extension = 'tar'
+      @model.compressor.compress_with do |command, ext|
+        pipeline << command
+        extension << ext
+      end if @model.compressor
+
+      pipeline << "#{ utility(:cat) } > '#{ File.join(path, "#{ name }.#{ extension }") }'"
+
+      #puts "commands: #{pipeline.commands}"
+      #exit
+
+      pipeline.run
+
+
+      if pipeline.success?
+        Logger.info "Archive '#{ name }' Complete!"
+      else
+        raise Error, "Failed to Create Archive '#{ name }'\n" +
+            pipeline.error_messages
+      end
+
+      if File.exists?(temp_local_file)
+        FileUtils.rm_rf(temp_local_file)
+        FileUtils.rm_rf(File.dirname(temp_local_file))
+      end
+
     end
 
     private
@@ -234,6 +247,10 @@ module Backup
       end
       def server_path=(val = true)
         @options[:server_path] = val
+      end
+
+      def temp_dir_path(val = true)
+        @options[:temp_dir_path] = val
       end
 
       ###
