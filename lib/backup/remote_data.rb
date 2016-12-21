@@ -80,7 +80,7 @@ module Backup
         f_remote = Tempfile.new('backup')
         remote_script_path = f_remote.path+"."+File.extname(local_script_path)
 
-        Logger.debug "upload script #{local_script_path} --> #{remote_script_path}"
+        Logger.info "upload script #{local_script_path} --> #{remote_script_path}"
 
         remote.ssh_upload_file(server_host, server_ssh_user, server_ssh_password, local_script_path, remote_script_path)
 
@@ -117,7 +117,7 @@ module Backup
       FileUtils.mkdir_p File.dirname(temp_local_file)
 
       # download backup
-      Logger.debug "download from #{remote_archive_file} to #{temp_local_file}"
+      Logger.info "download from #{remote_archive_file} to #{temp_local_file}"
 
       res_download = remote.ssh_download_file(
           server_host, server_ssh_user, server_ssh_password,
