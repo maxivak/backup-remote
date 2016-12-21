@@ -59,23 +59,38 @@ module Backup
   end
 
 
-      def ssh_download_file(hostname, ssh_user, ssh_pass, remote_filename, dest_filename)
-        host = SSHKit::Host.new("#{ssh_user}@#{hostname}")
-        host.password = ssh_pass
 
-        on host do |host|
-          download! remote_filename, dest_filename
-        end
+  def ssh_download_file(hostname, ssh_user, ssh_pass, remote_filename, dest_filename)
+    Net::SCP.download!(hostname, ssh_user, remote_filename, dest_filename, :ssh => { :password => ssh_pass })
 
-        #
-        return {res: 1, output: ""}
+    #
+    return {res: 1, output: ""}
 
-      rescue => e
-        {
-            res: 0,
-            error: e.message
-        }
-      end
+  rescue => e
+    {
+        res: 0,
+        error: e.message
+    }
+  end
+
+  # !! NOT work on big files > 4Gb
+  def ssh_download_file_sshkit(hostname, ssh_user, ssh_pass, remote_filename, dest_filename)
+    host = SSHKit::Host.new("#{ssh_user}@#{hostname}")
+    host.password = ssh_pass
+
+    on host do |host|
+      download! remote_filename, dest_filename
+    end
+
+    #
+    return {res: 1, output: ""}
+
+  rescue => e
+    {
+        res: 0,
+        error: e.message
+    }
+  end
 
   def ssh_upload_file(hostname, ssh_user, ssh_pass, source_file, dest_file, handler=nil)
     host = SSHKit::Host.new("#{ssh_user}@#{hostname}")

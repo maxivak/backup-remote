@@ -64,49 +64,50 @@ module Backup
       remote = Backup::Remote::Command.new
 
 
+      remote_archive_file = server_path
+
+      # generate backup on remote server
+      remote_script = script
+
+      if remote_script && remote_script!=""
+        # use script
+        # upload script
+
+        puts "config root: #{Config.root_path}"
+        puts "config: #{Config.inspect}"
+
+        local_script_path = File.join(Config.root_path, remote_script)
+
+        f_remote = Tempfile.new('backup')
+        remote_script_path = f_remote.path+"."+File.extname(local_script_path)
+
+        #puts "upload script #{local_script_path} --> #{remote_script_path}"
+        remote.ssh_upload_file(server_host, server_ssh_user, server_ssh_password, local_script_path, remote_script_path)
+
+        cmd_remote = "chmod +x #{remote_script_path} && sh #{remote_script_path}"
+        res_generate = remote.run_ssh_cmd(
+            server_host, server_ssh_user, server_ssh_password,
+            cmd_remote)
+
+        # delete temp script
+        cmd_delete = "rm -rf #{remote_script_path}"
+        res_delete = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd_delete)
+
+      else
+        # use command
+        cmd_remote = server_command
+        res_generate = remote.run_ssh_cmd(
+            server_host, server_ssh_user, server_ssh_password,
+            cmd_remote)
+      end
+
+      if res_generate[:res]==0
+        raise 'Cannot create backup on server'
+      end
+
+
       Dir.mktmpdir do |temp_dir|
         temp_local_file = File.join("#{temp_dir}", File.basename(server_path))
-
-        remote_archive_file = server_path
-
-        # generate backup on remote server
-        remote_script = script
-
-        if remote_script && remote_script!=""
-          # use script
-          # upload script
-
-          puts "config root: #{Config.root_path}"
-          puts "config: #{Config.inspect}"
-
-          local_script_path = File.join(Config.root_path, remote_script)
-
-          f_remote = Tempfile.new('backup')
-          remote_script_path = f_remote.path+"."+File.extname(local_script_path)
-
-          #puts "upload script #{local_script_path} --> #{remote_script_path}"
-          remote.ssh_upload_file(server_host, server_ssh_user, server_ssh_password, local_script_path, remote_script_path)
-
-          cmd_remote = "chmod +x #{remote_script_path} && sh #{remote_script_path}"
-          res_generate = remote.run_ssh_cmd(
-              server_host, server_ssh_user, server_ssh_password,
-              cmd_remote)
-
-          # delete temp script
-          cmd_delete = "rm -rf #{remote_script_path}"
-          res_delete = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd_delete)
-
-        else
-          # use command
-          cmd_remote = server_command
-          res_generate = remote.run_ssh_cmd(
-              server_host, server_ssh_user, server_ssh_password,
-              cmd_remote)
-        end
-
-        if res_generate[:res]==0
-          raise 'Cannot create backup on server'
-        end
 
         # download backup
         #puts "download from #{remote_archive_file} to #{temp_local_file}"
