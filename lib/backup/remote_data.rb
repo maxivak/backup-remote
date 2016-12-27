@@ -138,7 +138,8 @@ module Backup
       pipeline = Pipeline.new
 
       #temp_tar_root= tar_root
-      temp_tar_root= temp_dir_path
+      #temp_tar_root= temp_dir_path
+      temp_tar_root= File.dirname(temp_local_file)
       pipeline.add(
           "#{ tar_command } #{ tar_options } -cPf - -C #{temp_tar_root } #{ File.basename(temp_local_file) }",
           tar_success_codes
