@@ -124,11 +124,7 @@ module Backup
         # download backup
         dump_file = File.join(dump_path, dump_filename+"."+dump_ext)
 
-        #puts "dump local: #{dump_file}"
-
         res_download = remote.ssh_download_file(server_host, server_ssh_user, server_ssh_password, dump_remote_file, dump_file)
-
-        #puts "res: #{res_download}"
 
         if res_download[:res]==0
           raise 'Cannot download file from server'
@@ -137,15 +133,7 @@ module Backup
         #puts "pipe: #{pipeline.commands.inspect}"
         #puts "cmd: #{cmd_remote}"
 
-        #exit
-
         # download dump from server
-
-        #puts "file: #{dump_filename}"
-        #puts "path: #{dump_path}"
-
-        #exit
-
         #pipeline.run
         #if pipeline.success?
         #  log!(:finished)
