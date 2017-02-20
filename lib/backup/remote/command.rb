@@ -13,17 +13,20 @@ module Backup
 
 
   def run_ssh_cmd(hostname, ssh_user, ssh_pass, cmd)
-    srv = ssh_user+'@'+hostname
-    all_servers = [srv]
+    host = SSHKit::Host.new({hostname: hostname, user: ssh_user})
+    host.password = ssh_pass
+
+    #srv = ssh_user+'@'+hostname
+    all_servers = [host]
 
     output = ''
 
     on all_servers do |srv|
+    #SSHKit::Coordinator.new(host).each in: :sequence do
       as(user: ssh_user) do
         #execute(cmd)
         output = capture(cmd)
       end
-
     end
 
     #
