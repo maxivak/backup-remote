@@ -146,7 +146,8 @@ module Backup
 
       def mysqldump
         #"#{ utility(:mysqldump) } #{ user_options } #{ credential_options } " +
-        "#{ utility_remote(:mysqldump) } #{ user_options } #{ credential_options } " +
+        u = utility_remote(:mysqldump, server_host, server_ssh_user, server_ssh_password)
+        "#{u} #{ user_options } #{ credential_options } " +
         "#{ connectivity_options } #{ name_option } " +
         "#{ tables_to_dump } #{ tables_to_skip }"
       end

@@ -115,6 +115,9 @@ module Backup
         @gnu_tar = !!run("#{ utility(:tar) } --version").match(/GNU/)
       end
 
+
+
+
       private
 
       ##
@@ -135,31 +138,7 @@ module Backup
         UTILITY[name].dup
       end
 
-      ##
-      # Returns the full path to the specified utility.
-      # Raises an error if utility can not be found in the system's $PATH
-      def utility_remote(name, hostname, ssh_user, ssh_password)
-        name = name.to_s.strip
-        raise Error, 'Utility Name Empty' if name.empty?
 
-        req = Backup::Remote::Command.new
-        cmd = %Q(which '#{ name }' 2>/dev/null)
-        res = req.run_ssh_cmd(hostname, ssh_user, ssh_password, cmd)
-        output = res[:output].chomp
-
-        raise Error, <<-EOS if res[:res]==0 || output.empty?
-          Could not locate '#{ name }'.
-          Make sure the specified utility is installed
-          and available in your system's $PATH, or specify it's location
-          in your 'config.rb' file using Backup::Utilities.configure
-        EOS
-
-
-        UTILITY[name] ||= output
-
-
-        UTILITY[name].dup
-      end
 
       ##
       # Returns the name of the command name from the given command line.
@@ -243,6 +222,33 @@ module Backup
         define_method name, lambda {|arg| Utilities.send(name, arg) }
         private name
       end
+
+      ##
+      # Returns the full path to the specified utility.
+      # Raises an error if utility can not be found in the system's $PATH
+      def utility_remote(name, hostname, server_ssh_user, server_ssh_password)
+        name = name.to_s.strip
+        raise Error, 'Utility Name Empty' if name.empty?
+
+        req = Backup::Remote::Command.new
+        cmd = %Q(which '#{ name }' 2>/dev/null)
+        res = req.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd)
+        output = res[:output].chomp
+
+        raise Error, <<-EOS if res[:res]==0 || output.empty?
+          Could not locate '#{ name }'.
+          Make sure the specified utility is installed
+          and available in your system's $PATH, or specify it's location
+          in your 'config.rb' file using Backup::Utilities.configure
+        EOS
+
+
+        UTILITY[name] ||= output
+
+
+        UTILITY[name].dup
+      end
+
       private
       def gnu_tar?; Utilities.gnu_tar?; end
     end
