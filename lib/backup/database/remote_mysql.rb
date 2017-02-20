@@ -145,7 +145,8 @@ module Backup
       private
 
       def mysqldump
-        "#{ utility(:mysqldump) } #{ user_options } #{ credential_options } " +
+        #"#{ utility(:mysqldump) } #{ user_options } #{ credential_options } " +
+        "#{ utility_remote(:mysqldump) } #{ user_options } #{ credential_options } " +
         "#{ connectivity_options } #{ name_option } " +
         "#{ tables_to_dump } #{ tables_to_skip }"
       end
