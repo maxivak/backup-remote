@@ -83,7 +83,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'netrc', '= 0.11.0'
   gem.add_dependency 'nokogiri', '= 1.6.8'
   #gem.add_dependency 'open4', '= 1.3.0'
-  gem.add_dependency 'open4', '= 1.3.4'
+  gem.add_dependency 'open4', '>= 1.3.0'
   gem.add_dependency 'pagerduty', '= 2.0.0'
   gem.add_dependency 'pkg-config', '= 1.1.7'
   gem.add_dependency 'qiniu', '= 6.5.1'
@@ -97,8 +97,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'unf_ext', '= 0.0.6'
   gem.add_dependency 'xml-simple', '= 1.1.4'
 
-  gem.add_dependency 'sshkit', '= 1.11.3'
-  gem.add_dependency 'sshkit-sudo', '= 0.1.0'
+  gem.add_dependency 'sshkit', '>= 1.11.3'
+  gem.add_dependency 'sshkit-sudo', '>= 0.1.0'
 
 
 end
