@@ -237,9 +237,7 @@ module Backup
 
         raise Error, <<-EOS if res[:res]==0 || output.empty?
           Could not locate '#{ name }'.
-          Make sure the specified utility is installed
-          and available in your system's $PATH, or specify it's location
-          in your 'config.rb' file using Backup::Utilities.configure
+          SSH command output: #{output}.
         EOS
 
 
