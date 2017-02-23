@@ -237,7 +237,7 @@ module Backup
 
         raise Error, <<-EOS if res[:res]==0 || output.empty?
           Could not locate '#{ name }'.
-          SSH command output: #{output}.
+          Reason: #{output}, #{res[:error]}.
         EOS
 
 
