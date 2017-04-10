@@ -105,7 +105,7 @@ module Backup
         res_upload = remote.ssh_upload_file(server_host, server_ssh_user, server_ssh_password, files_from, files_from)
 
         if res_upload[:res]==0
-          raise "Cannot upload file from server - #{files_from}"
+          raise "Cannot upload file to server - #{files_from}"
         end
 
         #

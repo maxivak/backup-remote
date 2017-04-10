@@ -127,14 +127,7 @@ module Backup
     f_temp = "/tmp/#{SecureRandom.uuid}"
 
     # sshkit
-    on host do |host|
-      as(user: ssh_user) do
-
-      end
-
-      # NOT WORK with sudo
-      #upload! source_file, dest_file
-
+    SSHKit::Coordinator.new(host).each in: :sequence do
       # upload to temp file
       upload! source_file, f_temp
 
@@ -142,6 +135,23 @@ module Backup
       execute("cp #{f_temp} #{dest_file}", interaction_handler: handler)
 
     end
+
+=begin
+    on host do |host|
+      # NOT WORK with sudo
+      #upload! source_file, dest_file
+
+
+      as(user: ssh_user) do
+        # upload to temp file
+        upload! source_file, f_temp
+
+        # upload to dest
+        execute("cp #{f_temp} #{dest_file}", interaction_handler: handler)
+
+      end
+    end
+=end
 
     #
     return     {res: 1, output: ""}
