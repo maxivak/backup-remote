@@ -12,6 +12,9 @@ module Backup
 
 
       def run_ssh_cmd(hostname, ssh_user, ssh_pass, cmd)
+        #cmd = "bash -c 'whoami'"
+
+        #puts "run ssh cmd: #{hostname}, #{ssh_user}, #{ssh_pass}, #{cmd}"
         host = SSHKit::Host.new({hostname: hostname, user: ssh_user})
         host.password = ssh_pass
 
@@ -20,18 +23,28 @@ module Backup
 
         output = ''
 
+        SSHKit::Coordinator.new(host).each in: :sequence do
+          output = capture cmd
+        end
+
+
+=begin
         on all_servers do |srv|
-        #SSHKit::Coordinator.new(host).each in: :sequence do
           as(user: ssh_user) do
             #execute(cmd)
             output = capture(cmd)
           end
         end
+=end
+
+        puts "output: #{output}"
 
         #
         return {     res: 1,      output: output   }
 
       rescue => e
+        #puts "ssh error: #{e.message}, #{e.backtrace}"
+
         {
             res: 0,
             output: output,

@@ -231,6 +231,9 @@ module Backup
         raise Error, 'Utility Name Empty' if name.empty?
 
         req = Backup::Remote::Command.new
+        #req.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, "whoami")
+        #req.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, "which ruby")
+
         cmd = %Q(which '#{ name }' 2>/dev/null)
         res = req.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd)
         output = res[:output].chomp
