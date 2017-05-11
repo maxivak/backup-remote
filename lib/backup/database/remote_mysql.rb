@@ -15,9 +15,12 @@ module Backup
 
       # server options
       attr_accessor :server_host
+      attr_accessor :server_ssh_options
+      attr_accessor :server_ssh_port
       attr_accessor :server_ssh_user
       attr_accessor :server_ssh_password
       attr_accessor :server_ssh_key
+
       attr_accessor :server_backup_path
 
 
@@ -93,6 +96,8 @@ module Backup
       def perform!
         super
 
+        # prepare
+        build_server_ssh_options
 
         #
         pipeline = Pipeline.new
@@ -114,17 +119,18 @@ module Backup
         # generate backup on remote server
         cmd_remote = pipeline.commands.join(" | ")
 
+
         remote = Backup::Remote::Command.new
-        res_generate = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd_remote)
+        res_generate = remote.run_ssh_cmd(server_host, server_ssh_options, cmd_remote)
 
         if res_generate[:res]==0
-          raise 'Cannot create backup on server'
+          raise "Cannot create backup on server. #{res_generate[:error]}"
         end
 
         # download backup
         dump_file = File.join(dump_path, dump_filename+"."+dump_ext)
 
-        res_download = remote.ssh_download_file(server_host, server_ssh_user, server_ssh_password, dump_remote_file, dump_file)
+        res_download = remote.ssh_download_file(server_host, server_ssh_options, dump_remote_file, dump_file)
 
         if res_download[:res]==0
           raise 'Cannot download file from server'
@@ -142,11 +148,30 @@ module Backup
         #end
       end
 
+      def build_server_ssh_options
+        ssh_options = {}
+        v = self.server_ssh_user
+        ssh_options[:user] = v if v
+
+
+        v = self.server_ssh_password
+        ssh_options[:password] = v if v
+
+        v = self.server_ssh_key
+        ssh_options[:key] = v if v
+
+        v = self.server_ssh_port
+        ssh_options[:port] = v if v
+
+
+        self.server_ssh_options = ssh_options
+      end
+
       private
 
       def mysqldump
         #"#{ utility(:mysqldump) } #{ user_options } #{ credential_options } " +
-        u = utility_remote(:mysqldump, server_host, server_ssh_user, server_ssh_password)
+        u = utility_remote(:mysqldump)
         "#{u} #{ user_options } #{ credential_options } " +
         "#{ connectivity_options } #{ name_option } " +
         "#{ tables_to_dump } #{ tables_to_skip }"

@@ -18,9 +18,7 @@ module Backup
 
     # server options
     attr_accessor :server_host
-    attr_accessor :server_ssh_user
-    attr_accessor :server_ssh_password
-    attr_accessor :server_ssh_key
+    attr_accessor :server_ssh_options
     attr_accessor :server_backup_path
 
 
@@ -29,7 +27,7 @@ module Backup
     # Adds a new Archive to a Backup Model.
     #
     #     Backup::Model.new(:my_backup, 'My Backup') do
-    #       archive :my_archive do |archive|
+    #       remote_archive :my_archive do |archive|
     #         archive.add 'path/to/archive'
     #         archive.add '/another/path/to/archive'
     #         archive.exclude 'path/to/exclude'
@@ -82,10 +80,23 @@ module Backup
 
       DSL.new(@options).instance_eval(&block)
 
-      #
+      # server options
       self.server_host = @options[:server_host]
-      self.server_ssh_user = @options[:server_ssh_user]
-      self.server_ssh_password = @options[:server_ssh_password]
+      ssh_options = {}
+      v = @options[:server_ssh_user]
+      ssh_options[:user] = v if v
+
+      v = @options[:server_ssh_password]
+      ssh_options[:password] = v if v
+
+      v = @options[:server_ssh_key]
+      ssh_options[:key] = v if v
+
+      v = @options[:server_ssh_port]
+      ssh_options[:port] = v if v
+
+
+      self.server_ssh_options = ssh_options
     end
 
     def perform!
@@ -102,7 +113,7 @@ module Backup
       pipeline = Pipeline.new
       with_files_from(paths_to_package) do |files_from|
         # upload to server
-        res_upload = remote.ssh_upload_file(server_host, server_ssh_user, server_ssh_password, files_from, files_from)
+        res_upload = remote.ssh_upload_file(server_host, server_ssh_options, files_from, files_from)
 
         if res_upload[:res]==0
           raise "Cannot upload file to server - #{files_from}"
@@ -136,14 +147,14 @@ module Backup
         #exit
 
 
-        res_generate = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd_remote)
+        res_generate = remote.run_ssh_cmd(server_host, server_ssh_options, cmd_remote)
 
         if res_generate[:res]==0
           raise 'Cannot create backup on server'
         end
 
         # download backup
-        res_download = remote.ssh_download_file(server_host, server_ssh_user, server_ssh_password, remote_archive_file, archive_file)
+        res_download = remote.ssh_download_file(server_host, server_ssh_options, remote_archive_file, archive_file)
 
         #puts "res: #{res_download}"
 
@@ -152,7 +163,7 @@ module Backup
         end
 
         # delete archive on server
-        res_delete = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, "rm #{remote_archive_file}")
+        res_delete = remote.run_ssh_cmd(server_host, server_ssh_options, "rm #{remote_archive_file}")
 
       end
 
@@ -223,11 +234,18 @@ module Backup
         @options[:server_host] = val
       end
 
+      def server_ssh_port=(val = true)
+        @options[:server_ssh_port] = val
+      end
+
       def server_ssh_user=(val = true)
         @options[:server_ssh_user] = val
       end
       def server_ssh_password=(val = true)
         @options[:server_ssh_password] = val
+      end
+      def server_ssh_key=(val = true)
+        @options[:server_ssh_key] = val
       end
 
       ###

@@ -18,9 +18,8 @@ module Backup
 
     # server options
     attr_accessor :server_host
-    attr_accessor :server_ssh_user
-    attr_accessor :server_ssh_password
-    attr_accessor :server_ssh_key
+    attr_accessor :server_ssh_options
+
     attr_accessor :server_path
     attr_accessor :server_command
     attr_accessor :script
@@ -43,10 +42,27 @@ module Backup
 
       DSL.new(@options).instance_eval(&block)
 
-      #
+      # ssh options
       self.server_host = @options[:server_host]
-      self.server_ssh_user = @options[:server_ssh_user]
-      self.server_ssh_password = @options[:server_ssh_password]
+
+      # server options
+      ssh_options = {}
+      v = @options[:server_ssh_user]
+      ssh_options[:user] = v if v
+
+      v = @options[:server_ssh_password]
+      ssh_options[:password] = v if v
+
+      v = @options[:server_ssh_key]
+      ssh_options[:key] = v if v
+
+      v = @options[:server_ssh_port]
+      ssh_options[:port] = v if v
+
+
+      self.server_ssh_options = ssh_options
+
+      # server options
       self.server_path = @options[:server_path]
       self.server_command = @options[:server_command]
       self.script = @options[:script]
@@ -82,27 +98,23 @@ module Backup
 
         Logger.info "upload script #{local_script_path} --> #{remote_script_path}"
 
-        remote.ssh_upload_file(server_host, server_ssh_user, server_ssh_password, local_script_path, remote_script_path)
+        remote.ssh_upload_file(server_host, server_ssh_options, local_script_path, remote_script_path)
 
         cmd_remote = "chmod +x #{remote_script_path} && sh #{remote_script_path}"
-        res_generate = remote.run_ssh_cmd(
-            server_host, server_ssh_user, server_ssh_password,
-            cmd_remote)
+        res_generate = remote.run_ssh_cmd(server_host, server_ssh_options, cmd_remote)
 
         # delete temp script
         cmd_delete = "rm -rf #{remote_script_path}"
-        res_delete = remote.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd_delete)
+        res_delete = remote.run_ssh_cmd(server_host, server_ssh_options, cmd_delete)
 
       else
         # use command
         cmd_remote = server_command
-        res_generate = remote.run_ssh_cmd(
-            server_host, server_ssh_user, server_ssh_password,
-            cmd_remote)
+        res_generate = remote.run_ssh_cmd(server_host, server_ssh_options, cmd_remote)
       end
 
       if res_generate[:res]==0
-        raise 'Cannot create backup on server'
+        raise "Cannot create backup on server: #{res_generate[:error]}"
       end
 
 
@@ -119,18 +131,14 @@ module Backup
       # download backup
       Logger.info "download from #{remote_archive_file} to #{temp_local_file}"
 
-      res_download = remote.ssh_download_file(
-          server_host, server_ssh_user, server_ssh_password,
-          remote_archive_file, temp_local_file)
+      res_download = remote.ssh_download_file(server_host, server_ssh_options, remote_archive_file, temp_local_file)
 
       if res_download[:res]==0
         raise 'Cannot download file from server'
       end
 
       # delete archive on server
-      res_delete = remote.run_ssh_cmd(
-          server_host, server_ssh_user, server_ssh_password,
-          "rm #{remote_archive_file}")
+      res_delete = remote.run_ssh_cmd(server_host, server_ssh_options, "rm #{remote_archive_file}")
 
 
       # process archive locally
@@ -232,12 +240,20 @@ module Backup
         @options[:server_host] = val
       end
 
+      def server_ssh_port=(val = true)
+        @options[:server_ssh_port] = val
+      end
+
       def server_ssh_user=(val = true)
         @options[:server_ssh_user] = val
       end
       def server_ssh_password=(val = true)
         @options[:server_ssh_password] = val
       end
+      def server_ssh_key=(val = true)
+        @options[:server_ssh_key] = val
+      end
+
 
       def server_command=(val = true)
         @options[:server_command] = val

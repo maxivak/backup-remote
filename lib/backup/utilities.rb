@@ -226,16 +226,13 @@ module Backup
       ##
       # Returns the full path to the specified utility.
       # Raises an error if utility can not be found in the system's $PATH
-      def utility_remote(name, hostname, server_ssh_user, server_ssh_password)
+      def utility_remote(name)
         name = name.to_s.strip
         raise Error, 'Utility Name Empty' if name.empty?
 
         req = Backup::Remote::Command.new
-        #req.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, "whoami")
-        #req.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, "which ruby")
-
         cmd = %Q(which '#{ name }' 2>/dev/null)
-        res = req.run_ssh_cmd(server_host, server_ssh_user, server_ssh_password, cmd)
+        res = req.run_ssh_cmd(server_host, server_ssh_options, cmd)
         output = res[:output].chomp
 
         raise Error, <<-EOS if res[:res]==0 || output.empty?
