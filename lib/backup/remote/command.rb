@@ -12,7 +12,6 @@ module Backup
 
 
       def self.build_sshkit_host(hostname, ssh_options)
-        puts "DEBUG: #{ssh_options}"
         ssh_user = ssh_options[:user]
         ssh_pass = ssh_options[:password]
         ssh_key = ssh_options[:key]
