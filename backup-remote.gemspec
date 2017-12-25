@@ -99,6 +99,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'xml-simple', '>= 1.1.4'
 =end
 
+  gem.add_dependency 'nokogiri', '>= 1.8.1'
+
   gem.add_dependency 'sshkit', '>= 1.11.3'
   gem.add_dependency 'sshkit-sudo', '>= 0.1.0'
 
