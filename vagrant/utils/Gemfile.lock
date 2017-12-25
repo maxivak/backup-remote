@@ -1,38 +1,50 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activerecord (2.3.18)
-      activesupport (= 2.3.18)
+    activemodel (3.2.22.5)
+      activesupport (= 3.2.22.5)
+      builder (~> 3.0.0)
+    activerecord (3.2.22.5)
+      activemodel (= 3.2.22.5)
+      activesupport (= 3.2.22.5)
+      arel (~> 3.0.2)
+      tzinfo (~> 0.3.29)
     activerecord-mysql2-adapter (0.0.3)
       mysql2
-    activesupport (2.3.18)
-    beefcake (0.3.7)
-    bson (1.9.1)
-    bson_ext (1.9.1)
-      bson (~> 1.9.1)
-    builder (3.2.2)
-    i18n (0.6.4)
-    iconv (1.0.3)
-    innertube (1.0.2)
-    mongo (1.9.1)
-      bson (~> 1.9.1)
-    multi_json (1.7.8)
-    mysql2 (0.3.13)
-    pg (0.16.0)
-    rake (10.1.0)
-    redis (3.0.4)
-    riak-client (1.2.0)
-      beefcake (~> 0.3.7)
-      builder (>= 2.1.2)
-      i18n (>= 0.4.0)
-      innertube (~> 1.0.2)
+    activesupport (3.2.22.5)
+      i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
+    arel (3.0.3)
+    beefcake (1.2.0)
+    bson (4.2.2)
+    bson_ext (1.5.1)
+    builder (3.0.4)
+    cert_validator (0.0.1)
+    concurrent-ruby (1.0.5)
+    i18n (0.9.1)
+      concurrent-ruby (~> 1.0)
+    iconv (1.0.4)
+    innertube (1.1.0)
+    mongo (2.4.3)
+      bson (>= 4.2.1, < 5.0.0)
+    multi_json (1.12.2)
+    mysql2 (0.4.10)
+    pg (0.21.0)
+    rake (12.3.0)
+    redis (4.0.1)
+    riak-client (2.6.0)
+      beefcake (~> 1.1)
+      cert_validator (~> 0.0.1)
+      i18n (~> 0.6)
+      innertube (~> 1.0)
+      multi_json (~> 1.0)
+    tzinfo (0.3.53)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord
+  activerecord (~> 3.2.19)
   activerecord-mysql2-adapter
   bson_ext
   iconv
@@ -41,3 +53,6 @@ DEPENDENCIES
   rake
   redis
   riak-client
+
+BUNDLED WITH
+   1.15.3
