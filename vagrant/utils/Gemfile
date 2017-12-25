@@ -3,7 +3,7 @@ source "https://rubygems.org"
 gem 'rake'
 
 # MySQL, PostgreSQL
-gem 'activerecord', '~> 3.2.19'
+gem 'activerecord', '>=4.2.7'
 gem 'activerecord-mysql2-adapter'
 gem 'iconv'
 gem 'pg'
