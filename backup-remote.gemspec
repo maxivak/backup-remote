@@ -103,6 +103,10 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'sshkit', '>= 1.11.3'
   gem.add_dependency 'sshkit-sudo', '>= 0.1.0'
-
+  gem.add_dependency 'open4', '>= 1.3.0'
+  gem.add_dependency 'thor', '>= 0.18.1'
+  gem.add_dependency 'excon', '>= 0.44.4'
+  gem.add_dependency 'formatador', '>= 0.2.5'
+  gem.add_dependency 'fog', '>= 1.28.0'
 
 end
