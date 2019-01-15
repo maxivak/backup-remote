@@ -31,7 +31,7 @@ Backup process:
 
 * specify server connection options in your model
 
-```
+```ruby
 Model.new(:my_backup, 'My Backup') do
   database RemoteMySQL do |db|
     # options for server
@@ -49,7 +49,7 @@ end
 ````
 
 * perform backup - run script `backup peform` from the backup server
-```
+```bash
 backup-remote perform -t my_backup
 ```
 
@@ -82,7 +82,7 @@ Options for SSH connection:
 * Use remote_archive in your model
 
 
-```
+```ruby
 
 Model.new(:my_server_files_backup, 'Backup files') do
 
@@ -115,7 +115,7 @@ end
 
 ### Remote MySQL Database
 
-```
+```ruby
 Model.new(:my_backup, 'My Backup') do
   database RemoteMySQL do |db|
     # options for server
@@ -145,7 +145,7 @@ end
 * This command should create an archive file with filename specified in server_path option.
 
 
-```
+```ruby
 Model.new(:my_server_data_backup, 'Backup data') do
 
   remote_data :mydata do |archive|
