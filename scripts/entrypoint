@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-backup-remote perform -t backup -c /etc/config.rb
